@@ -27,25 +27,28 @@
   </head>
   <body>
     <div id="drag-drop-basic">
-      <div id="source-container">
+      <div id="source-container" data-role="drag-drop-container">
         <div id="drag-source" draggable="true"></div>
       </div>
-      <div id="target-container"></div>
+      <div id="target-container" data-role="drag-drop-container"></div>
     </div>
 
     <script>
-      let dragSource = document.querySelector("#drag-source");
-      dragSource.addEventListener("dragstart", dragStart);
+      let dragSources = document.querySelectorAll('[draggable="true"]');
+      dragSources.forEach((dragSource) => {
+        dragSource.addEventListener("dragstart", dragStart);
+      });
 
       function dragStart(e) {
-        console.log("dragStart", e);
         e.dataTransfer.setData("text/plain", e.target.id);
       }
 
-      let dropTarget = document.querySelector("#target-container");
-      dropTarget.addEventListener("drop", dropped);
-      dropTarget.addEventListener("dragenter", cancelDefault);
-      dropTarget.addEventListener("dragover", cancelDefault);
+      let dropTargets = document.querySelectorAll('[data-role="drag-drop-container"]');
+      dropTargets.forEach((dropTarget) => {
+        dropTarget.addEventListener("drop", dropped);
+        dropTarget.addEventListener("dragenter", cancelDefault);
+        dropTarget.addEventListener("dragover", cancelDefault);
+      });
 
       function dropped(e) {
         console.log("dropped", e);
