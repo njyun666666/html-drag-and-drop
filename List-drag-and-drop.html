@@ -32,15 +32,20 @@
       ul.moveable li:hover {
         background-color: #eee;
       }
+      ul.moveable li.drag-sort-active {
+        background-color: transparent;
+        color: transparent;
+        border: 1px solid red !important;
+      }
     </style>
   </head>
   <body>
     <div>
       <ul id="items-list" class="moveable">
-        <li>One</li>
-        <li>Two</li>
-        <li>Three</li>
-        <li>Four</li>
+        <li id="One">One</li>
+        <li id="Two">Two</li>
+        <li id="Three">Three</li>
+        <li id="Four">Four</li>
       </ul>
     </div>
 
@@ -49,43 +54,29 @@
       items.forEach((item) => {
         // $(item).prop("draggable", true);
         item.setAttribute("draggable", true);
-        item.addEventListener("dragstart", dragStart);
-        item.addEventListener("drop", dropped);
-        item.addEventListener("dragenter", cancelDefault);
-        item.addEventListener("dragover", cancelDefault);
+        item.addEventListener("drag", drag);
+        item.addEventListener("dragend", dragend);
       });
 
-      function dragStart(e) {
-        console.log("dragStart", e.target);
-        console.log([...items].indexOf(e.target));
-        var index = [...items].indexOf(e.target);
-        e.dataTransfer.setData("text/plain", index);
+      function drag(e) {
+        const selectedItem = e.target,
+          list = selectedItem.parentNode,
+          x = event.clientX,
+          y = event.clientY;
+
+        selectedItem.classList.add("drag-sort-active");
+
+        let swapItem = document.elementFromPoint(x, y) === null ? selectedItem : document.elementFromPoint(x, y);
+        console.log(swapItem);
+
+        if (list === swapItem.parentNode) {
+          swapItem = swapItem !== selectedItem.nextSibling ? swapItem : swapItem.nextSibling;
+          list.insertBefore(selectedItem, swapItem);
+        }
       }
 
-      function dropped(e) {
-        cancelDefault(e);
-        console.log("dropped", e);
-
-        // get new and old index
-        let oldIndex = e.dataTransfer.getData("text/plain");
-        let target = e.target;
-        let newIndex = [...items].indexOf(e.target);
-
-        // remove dropped items at old place
-        let dropped = items[oldIndex];
-        // console.log(dropped);
-        // items[oldIndex].remove();
-        //$(this).parent().children().eq(oldIndex).remove();
-
-        // insert the dropped items at new place
-        if (newIndex < oldIndex) {
-          target.before(dropped);
-        } else {
-          target.after(dropped);
-        }
-
-        // update items
-        items = document.querySelectorAll("#items-list > li");
+      function dragend(e) {
+        e.target.classList.remove("drag-sort-active");
       }
 
       function cancelDefault(e) {

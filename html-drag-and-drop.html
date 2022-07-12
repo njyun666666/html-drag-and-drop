@@ -71,7 +71,7 @@
         cancelDefault(e);
         let id = e.dataTransfer.getData("text/plain");
         // console.log(id);
-        e.target.appendChild(document.querySelector("#" + id));
+        e.target.appendChild(document.querySelector("#" + id).cloneNode(true));
         this.classList.remove("hover");
       }
 
